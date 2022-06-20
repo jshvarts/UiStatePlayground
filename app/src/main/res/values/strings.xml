@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">UiStatePlayground</string>
+    <string name="screen_title_home">Home</string>
+    <string name="screen_title_action_movies">Action Movies</string>
+    <string name="screen_title_animation_movies">Animation Movies</string>
+
+    <string name="section_title_top_rated">Top Rated</string>
+    <string name="section_title_action">Action</string>
+    <string name="section_title_animation">Animation</string>
+
+    <string name="section_filter_text_default">See All</string>
 </resources>
