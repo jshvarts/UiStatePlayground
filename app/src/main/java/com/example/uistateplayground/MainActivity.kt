@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.lazy.items
@@ -34,8 +35,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.uistateplayground.data.Movie
 import com.example.uistateplayground.data.MovieGenre
-import com.example.uistateplayground.ui.GenreViewModel
-import com.example.uistateplayground.ui.HomeViewModel
+import com.example.uistateplayground.ui.*
 import com.example.uistateplayground.ui.navigation.Screen
 import com.example.uistateplayground.ui.navigation.UiStatePlaygroundNavHost
 import com.example.uistateplayground.ui.theme.UiStatePlaygroundTheme
@@ -70,45 +70,41 @@ fun HomeScreen(
   modifier: Modifier = Modifier,
   homeViewModel: HomeViewModel = hiltViewModel()
 ) {
-  val state by homeViewModel.uiState.collectAsState()
+  val uiState: HomeUiState by homeViewModel.uiState.collectAsState()
 
-  if (state.isLoading) {
-    LoadingIndicator()
-  } else {
-    Column(
-      modifier
-        .verticalScroll(
-          rememberScrollState()
-        )
-    ) {
-      Spacer(Modifier.height(16.dp))
+  Column(
+    modifier
+      .verticalScroll(
+        rememberScrollState()
+      )
+  ) {
+    Spacer(Modifier.height(16.dp))
 
-      ScreenTitle(R.string.screen_title_home)
+    ScreenTitle(R.string.screen_title_home)
 
-      HomeSection(title = R.string.section_title_top_rated) {
-        TopRatedMovieList(state.topRatedMovies)
-      }
-
-      HomeSection(
-        title = R.string.section_title_action,
-        filter = SectionFilter {
-          navController.navigate(Screen.ActionMovies.route)
-        }
-      ) {
-        ActionMovieList(state.actionMovies)
-      }
-
-      HomeSection(
-        title = R.string.section_title_animation,
-        filter = SectionFilter {
-          navController.navigate(Screen.AnimationMovies.route)
-        }
-      ) {
-        AnimationMovieList(state.animationMovies)
-      }
-
-      Spacer(Modifier.height(16.dp))
+    HomeSection(title = R.string.section_title_top_rated) {
+      TopRatedMovieList(uiState.topRatedMovies)
     }
+
+    HomeSection(
+      title = R.string.section_title_action,
+      filter = SectionFilter {
+        navController.navigate(Screen.ActionMovies.route)
+      }
+    ) {
+      ActionMovieList(uiState.actionMovies)
+    }
+
+    HomeSection(
+      title = R.string.section_title_animation,
+      filter = SectionFilter {
+        navController.navigate(Screen.AnimationMovies.route)
+      }
+    ) {
+      AnimationMovieList(uiState.animationMovies)
+    }
+
+    Spacer(Modifier.height(16.dp))
   }
 }
 
@@ -145,7 +141,7 @@ fun HomeSection(
 }
 
 @Composable
-fun TopRatedMovieList(movies: List<Movie>) {
+fun TopRatedMovieList(uiState: TopRatedMoviesUiState) {
 
   LazyRow(
     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -154,14 +150,26 @@ fun TopRatedMovieList(movies: List<Movie>) {
       end = 16.dp
     )
   ) {
-    items(movies) { movie ->
-      HomePosterImage(movie)
+    when (uiState) {
+      TopRatedMoviesUiState.Error -> {
+        homeSectionErrorText(R.string.section_error_top_rated)
+      }
+      TopRatedMoviesUiState.Loading -> {
+        item {
+          LoadingIndicator()
+        }
+      }
+      is TopRatedMoviesUiState.Success -> {
+        items(uiState.movies) { movie ->
+          HomePosterImage(movie)
+        }
+      }
     }
   }
 }
 
 @Composable
-fun ActionMovieList(movies: List<Movie>) {
+fun ActionMovieList(uiState: ActionMoviesUiState) {
   LazyRow(
     modifier = Modifier
       .height(160.dp),
@@ -171,14 +179,26 @@ fun ActionMovieList(movies: List<Movie>) {
       end = 16.dp
     )
   ) {
-    items(movies) { movie ->
-      HomePosterImage(movie)
+    when (uiState) {
+      ActionMoviesUiState.Error -> {
+        homeSectionErrorText(R.string.section_error_action)
+      }
+      ActionMoviesUiState.Loading -> {
+        item {
+          LoadingIndicator()
+        }
+      }
+      is ActionMoviesUiState.Success -> {
+        items(uiState.movies) { movie ->
+          HomePosterImage(movie)
+        }
+      }
     }
   }
 }
 
 @Composable
-fun AnimationMovieList(movies: List<Movie>) {
+fun AnimationMovieList(uiState: AnimationMoviesUiState) {
   LazyHorizontalGrid(
     rows = GridCells.Fixed(2),
     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -189,19 +209,70 @@ fun AnimationMovieList(movies: List<Movie>) {
     ),
     modifier = Modifier
       .height(340.dp)
+      .fillMaxWidth()
   ) {
-    items(movies) { movie ->
-      HomePosterImage(movie)
+    when (uiState) {
+      AnimationMoviesUiState.Error -> {
+        homeSectionErrorText(R.string.section_error_animation)
+      }
+      AnimationMoviesUiState.Loading -> {
+        item {
+          LoadingIndicator()
+        }
+      }
+      is AnimationMoviesUiState.Success -> {
+        items(uiState.movies) { movie ->
+          HomePosterImage(movie)
+        }
+      }
     }
   }
 }
 
+fun LazyListScope.homeSectionErrorText(
+  @StringRes title: Int,
+  modifier: Modifier = Modifier
+) {
+  item {
+    ErrorText(
+      title = title,
+      modifier = modifier
+    )
+  }
+}
+
+fun LazyGridScope.homeSectionErrorText(
+  @StringRes title: Int,
+  modifier: Modifier = Modifier
+) {
+  item {
+    ErrorText(
+      title = title,
+      modifier = modifier
+    )
+  }
+}
+
 @Composable
-fun ScreenTitle(@StringRes title: Int) {
+fun ErrorText(
+  @StringRes title: Int,
+  modifier: Modifier = Modifier
+) {
+  Text(
+    text = stringResource(id = title),
+    modifier = modifier.padding(vertical = 24.dp)
+  )
+}
+
+@Composable
+fun ScreenTitle(
+  @StringRes title: Int,
+  modifier: Modifier = Modifier
+) {
   Text(
     text = stringResource(id = title),
     style = MaterialTheme.typography.h4,
-    modifier = Modifier.padding(horizontal = 16.dp)
+    modifier = modifier.padding(horizontal = 16.dp)
   )
 }
 
@@ -267,34 +338,45 @@ fun ActionMoviesScreen(viewModel: GenreViewModel = hiltViewModel()) {
     viewModel.fetchMovies(MovieGenre.ACTION)
   }
 
-  val state by viewModel.uiState.collectAsState()
-  if (state.isLoading) {
-    LoadingIndicator()
-  } else {
-    LazyVerticalGrid(
-      columns = GridCells.Adaptive(100.dp),
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
-      contentPadding = PaddingValues(
-        top = 16.dp,
-        bottom = 16.dp
-      )
-    ) {
+  val uiState: GenreUiState by viewModel.uiState.collectAsState()
 
-      item(span = { GridItemSpan(maxLineSpan) }) {
-        ScreenTitle(R.string.screen_title_action_movies)
+  LazyVerticalGrid(
+    columns = GridCells.Adaptive(100.dp),
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+    verticalArrangement = Arrangement.spacedBy(8.dp),
+    contentPadding = PaddingValues(
+      top = 16.dp,
+      bottom = 16.dp
+    )
+  ) {
+
+    item(span = { GridItemSpan(maxLineSpan) }) {
+      ScreenTitle(R.string.screen_title_action_movies)
+    }
+
+    when (uiState) {
+      GenreUiState.Error -> {
+        item(span = { GridItemSpan(maxLineSpan) }) {
+          ErrorText(
+            title = R.string.section_error_action,
+            modifier = Modifier
+              .padding(horizontal = 16.dp)
+          )
+        }
       }
-
-      item(span = { GridItemSpan(maxLineSpan) }) {
-        Spacer(Modifier.height(8.dp))
+      GenreUiState.Loading -> {
+        item(span = { GridItemSpan(maxLineSpan) }) {
+          LoadingIndicator()
+        }
       }
+      is GenreUiState.Success -> {
+        items((uiState as GenreUiState.Success).movies) { movie ->
+          GenrePosterImage(movie)
+        }
 
-      items(state.movies) { movie ->
-        GenrePosterImage(movie)
-      }
-
-      item(span = { GridItemSpan(maxLineSpan) }) {
-        Spacer(Modifier.height(16.dp))
+        item(span = { GridItemSpan(maxLineSpan) }) {
+          Spacer(Modifier.height(16.dp))
+        }
       }
     }
   }
@@ -302,39 +384,49 @@ fun ActionMoviesScreen(viewModel: GenreViewModel = hiltViewModel()) {
 
 @Composable
 fun AnimationMoviesScreen(viewModel: GenreViewModel = hiltViewModel()) {
-  val state by viewModel.uiState.collectAsState()
-
   LaunchedEffect(Unit) {
     viewModel.fetchMovies(MovieGenre.ANIMATION)
   }
 
-  if (state.isLoading) {
-    LoadingIndicator()
-  } else {
-    LazyVerticalGrid(
-      columns = GridCells.Adaptive(100.dp),
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
-      contentPadding = PaddingValues(
-        top = 16.dp,
-        bottom = 16.dp
-      )
-    ) {
+  val uiState: GenreUiState by viewModel.uiState.collectAsState()
 
-      item(span = { GridItemSpan(maxLineSpan) }) {
-        ScreenTitle(R.string.screen_title_animation_movies)
+  LazyVerticalGrid(
+    columns = GridCells.Adaptive(100.dp),
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+    verticalArrangement = Arrangement.spacedBy(8.dp),
+    contentPadding = PaddingValues(
+      top = 16.dp,
+      bottom = 16.dp
+    )
+  ) {
+
+    item(span = { GridItemSpan(maxLineSpan) }) {
+      ScreenTitle(R.string.screen_title_animation_movies)
+    }
+
+    when (uiState) {
+      GenreUiState.Error -> {
+        item(span = { GridItemSpan(maxLineSpan) }) {
+          ErrorText(
+            title = R.string.section_error_animation,
+            modifier = Modifier
+              .padding(horizontal = 16.dp)
+          )
+        }
       }
-
-      item(span = { GridItemSpan(maxLineSpan) }) {
-        Spacer(Modifier.height(8.dp))
+      GenreUiState.Loading -> {
+        item(span = { GridItemSpan(maxLineSpan) }) {
+          LoadingIndicator()
+        }
       }
+      is GenreUiState.Success -> {
+        items((uiState as GenreUiState.Success).movies) { movie ->
+          GenrePosterImage(movie)
+        }
 
-      items(state.movies) { movie ->
-        GenrePosterImage(movie)
-      }
-
-      item(span = { GridItemSpan(maxLineSpan) }) {
-        Spacer(Modifier.height(16.dp))
+        item(span = { GridItemSpan(maxLineSpan) }) {
+          Spacer(Modifier.height(16.dp))
+        }
       }
     }
   }
@@ -347,26 +439,26 @@ fun LoadingIndicator(modifier: Modifier = Modifier) {
     modifier = modifier
       .fillMaxSize()
   ) {
-    CircularProgressIndicator()
+    CircularProgressIndicator(color = Color.LightGray)
   }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun TopRatedMovieListPreview() {
-  TopRatedMovieList(getFakeMovieList())
+  TopRatedMovieList(getTopRatedMovieUiState())
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ActionMovieListPreview() {
-  ActionMovieList(getFakeMovieList())
+  ActionMovieList(getActionMovieUiState())
 }
 
 @Preview(showBackground = true)
 @Composable
 fun AnimationMovieListPreview() {
-  AnimationMovieList(getFakeMovieList())
+  AnimationMovieList(getAnimationMovieUiState())
 }
 
 data class SectionFilter(
@@ -374,12 +466,21 @@ data class SectionFilter(
   val onClick: () -> Unit
 )
 
-private fun getFakeMovieList() = listOf(
-  Movie("", ""),
-  Movie("", ""),
-  Movie("", ""),
-  Movie("", ""),
-  Movie("", ""),
-  Movie("", ""),
-  Movie("", "")
-)
+private fun getTopRatedMovieUiState(): TopRatedMoviesUiState {
+  val movies = getFakeMovieList()
+  return TopRatedMoviesUiState.Success(movies)
+}
+
+private fun getActionMovieUiState(): ActionMoviesUiState {
+  val movies = getFakeMovieList()
+  return ActionMoviesUiState.Success(movies)
+}
+
+private fun getAnimationMovieUiState(): AnimationMoviesUiState {
+  val movies = getFakeMovieList()
+  return AnimationMoviesUiState.Success(movies)
+}
+
+private fun getFakeMovieList() = List(10) { index ->
+  Movie(index.toString(), "")
+}

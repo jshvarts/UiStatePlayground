@@ -8,5 +8,9 @@
     <string name="section_title_action">Action</string>
     <string name="section_title_animation">Animation</string>
 
+    <string name="section_error_top_rated">Failed to load top rated movies</string>
+    <string name="section_error_action">Failed to load Action movies</string>
+    <string name="section_error_animation">Failed to load Animation movies</string>
+
     <string name="section_filter_text_default">See All</string>
 </resources>

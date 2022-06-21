@@ -2,6 +2,8 @@ package com.example.uistateplayground.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.uistateplayground.core.Result
+import com.example.uistateplayground.core.asResult
 import com.example.uistateplayground.data.Movie
 import com.example.uistateplayground.data.MovieGenre
 import com.example.uistateplayground.data.MovieRepository
@@ -11,24 +13,29 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class GenreUiState(
-  val movies: List<Movie> = emptyList(),
-  val isLoading: Boolean = false
-)
+sealed interface GenreUiState {
+  data class Success(val movies: List<Movie>) : GenreUiState
+  object Error : GenreUiState
+  object Loading : GenreUiState
+}
 
 @HiltViewModel
 class GenreViewModel @Inject constructor(
   private val movieRepository: MovieRepository
 ) : ViewModel() {
 
-  private val _uiState = MutableStateFlow(GenreUiState(isLoading = true))
+  private val _uiState = MutableStateFlow<GenreUiState>(GenreUiState.Loading)
   val uiState = _uiState.asStateFlow()
 
   fun fetchMovies(genre: MovieGenre) {
     viewModelScope.launch {
-      movieRepository.getMovies(genre)
-        .collect {
-          _uiState.value = GenreUiState(it)
+      movieRepository.getMoviesStream(genre).asResult()
+        .collect { result ->
+          _uiState.value = when (result) {
+            is Result.Success -> GenreUiState.Success(result.data)
+            is Result.Loading -> GenreUiState.Loading
+            is Result.Error -> GenreUiState.Error
+          }
         }
     }
   }

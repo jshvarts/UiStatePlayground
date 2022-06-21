@@ -12,7 +12,19 @@ class MovieRepository @Inject constructor(private val api: Api) {
     }
   }
 
+  fun getTopRatedMoviesStream(): Flow<List<Movie>> {
+    return flow {
+      emit(api.getTopRated())
+    }
+  }
+
   fun getMovies(genre: MovieGenre): Flow<List<Movie>> {
+    return flow {
+      emit(api.getMoviesForGenre(genre.id))
+    }
+  }
+
+  fun getMoviesStream(genre: MovieGenre): Flow<List<Movie>> {
     return flow {
       emit(api.getMoviesForGenre(genre.id))
     }
