@@ -338,7 +338,7 @@ fun ActionMoviesScreen(viewModel: GenreViewModel = hiltViewModel()) {
     viewModel.fetchMovies(MovieGenre.ACTION)
   }
 
-  val uiState: GenreUiState by viewModel.uiState.collectAsState()
+  val uiState: GenreScreenUiState by viewModel.uiState.collectAsState()
 
   LazyVerticalGrid(
     columns = GridCells.Adaptive(100.dp),
@@ -354,7 +354,7 @@ fun ActionMoviesScreen(viewModel: GenreViewModel = hiltViewModel()) {
       ScreenTitle(R.string.screen_title_action_movies)
     }
 
-    when (uiState) {
+    when (val genreState = uiState.genreState) {
       GenreUiState.Error -> {
         item(span = { GridItemSpan(maxLineSpan) }) {
           ErrorText(
@@ -370,7 +370,7 @@ fun ActionMoviesScreen(viewModel: GenreViewModel = hiltViewModel()) {
         }
       }
       is GenreUiState.Success -> {
-        items((uiState as GenreUiState.Success).movies) { movie ->
+        items(genreState.movies) { movie ->
           GenrePosterImage(movie)
         }
 
@@ -388,7 +388,7 @@ fun AnimationMoviesScreen(viewModel: GenreViewModel = hiltViewModel()) {
     viewModel.fetchMovies(MovieGenre.ANIMATION)
   }
 
-  val uiState: GenreUiState by viewModel.uiState.collectAsState()
+  val uiState: GenreScreenUiState by viewModel.uiState.collectAsState()
 
   LazyVerticalGrid(
     columns = GridCells.Adaptive(100.dp),
@@ -404,7 +404,7 @@ fun AnimationMoviesScreen(viewModel: GenreViewModel = hiltViewModel()) {
       ScreenTitle(R.string.screen_title_animation_movies)
     }
 
-    when (uiState) {
+    when (val genreState = uiState.genreState) {
       GenreUiState.Error -> {
         item(span = { GridItemSpan(maxLineSpan) }) {
           ErrorText(
@@ -420,7 +420,7 @@ fun AnimationMoviesScreen(viewModel: GenreViewModel = hiltViewModel()) {
         }
       }
       is GenreUiState.Success -> {
-        items((uiState as GenreUiState.Success).movies) { movie ->
+        items(genreState.movies) { movie ->
           GenrePosterImage(movie)
         }
 

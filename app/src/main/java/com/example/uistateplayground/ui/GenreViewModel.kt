@@ -19,23 +19,29 @@ sealed interface GenreUiState {
   object Loading : GenreUiState
 }
 
+data class GenreScreenUiState(
+  val genreState: GenreUiState
+)
+
 @HiltViewModel
 class GenreViewModel @Inject constructor(
   private val movieRepository: MovieRepository
 ) : ViewModel() {
 
-  private val _uiState = MutableStateFlow<GenreUiState>(GenreUiState.Loading)
+  private val _uiState = MutableStateFlow(GenreScreenUiState(GenreUiState.Loading))
   val uiState = _uiState.asStateFlow()
 
   fun fetchMovies(genre: MovieGenre) {
     viewModelScope.launch {
       movieRepository.getMoviesStream(genre).asResult()
         .collect { result ->
-          _uiState.value = when (result) {
+          val genreUiState = when (result) {
             is Result.Success -> GenreUiState.Success(result.data)
             is Result.Loading -> GenreUiState.Loading
             is Result.Error -> GenreUiState.Error
           }
+
+          _uiState.value = GenreScreenUiState(genreUiState)
         }
     }
   }
