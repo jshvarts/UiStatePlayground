@@ -66,9 +66,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun HomeScreen(
-  homeViewModel: HomeViewModel,
   navController: NavController,
   modifier: Modifier = Modifier,
+  homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
   val uiState: HomeUiState by homeViewModel.uiState.collectAsState()
 
