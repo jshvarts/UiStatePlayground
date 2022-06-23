@@ -80,6 +80,8 @@ dependencies {
 
     implementation 'io.coil-kt:coil-compose:2.1.0'
 
+    implementation 'com.google.accompanist:accompanist-swiperefresh:0.24.11-rc'
+
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.3'
     testImplementation 'app.cash.turbine:turbine:0.8.0'

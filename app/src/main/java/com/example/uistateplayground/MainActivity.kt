@@ -39,6 +39,8 @@ import com.example.uistateplayground.ui.*
 import com.example.uistateplayground.ui.navigation.Screen
 import com.example.uistateplayground.ui.navigation.UiStatePlaygroundNavHost
 import com.example.uistateplayground.ui.theme.UiStatePlaygroundTheme
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
@@ -72,39 +74,44 @@ fun HomeScreen(
 ) {
   val uiState: HomeUiState by homeViewModel.uiState.collectAsState()
 
-  Column(
-    modifier
-      .verticalScroll(
-        rememberScrollState()
-      )
+  SwipeRefresh(
+    state = rememberSwipeRefreshState(uiState.isRefreshing),
+    onRefresh = { homeViewModel.onRefresh() }
   ) {
-    Spacer(Modifier.height(16.dp))
-
-    ScreenTitle(R.string.screen_title_home)
-
-    HomeSection(title = R.string.section_title_top_rated) {
-      TopRatedMovieList(uiState.topRatedMovies)
-    }
-
-    HomeSection(
-      title = R.string.section_title_action,
-      filter = SectionFilter {
-        navController.navigate(Screen.ActionMovies.route)
-      }
+    Column(
+      modifier
+        .verticalScroll(
+          rememberScrollState()
+        )
     ) {
-      ActionMovieList(uiState.actionMovies)
-    }
+      Spacer(Modifier.height(16.dp))
 
-    HomeSection(
-      title = R.string.section_title_animation,
-      filter = SectionFilter {
-        navController.navigate(Screen.AnimationMovies.route)
+      ScreenTitle(R.string.screen_title_home)
+
+      HomeSection(title = R.string.section_title_top_rated) {
+        TopRatedMovieList(uiState.topRatedMovies)
       }
-    ) {
-      AnimationMovieList(uiState.animationMovies)
-    }
 
-    Spacer(Modifier.height(16.dp))
+      HomeSection(
+        title = R.string.section_title_action,
+        filter = SectionFilter {
+          navController.navigate(Screen.ActionMovies.route)
+        }
+      ) {
+        ActionMovieList(uiState.actionMovies)
+      }
+
+      HomeSection(
+        title = R.string.section_title_animation,
+        filter = SectionFilter {
+          navController.navigate(Screen.AnimationMovies.route)
+        }
+      ) {
+        AnimationMovieList(uiState.animationMovies)
+      }
+
+      Spacer(Modifier.height(16.dp))
+    }
   }
 }
 
