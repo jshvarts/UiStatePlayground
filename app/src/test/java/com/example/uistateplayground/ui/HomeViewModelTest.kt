@@ -6,9 +6,9 @@ import com.example.uistateplayground.data.TestMovieRepository
 import com.example.uistateplayground.util.TestDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -44,6 +44,27 @@ class HomeViewModelTest {
   fun `when uiStateAnimationMovies is initialized then shows loading`() = runTest {
     viewModel.uiState.test {
       assertEquals(AnimationMoviesUiState.Loading, awaitItem().animationMovies)
+    }
+  }
+
+  @Test
+  fun `when uiHomeState is initialized then shows correct state`() = runTest {
+    viewModel.uiState.test {
+      val initialState = awaitItem()
+      assertEquals(TopRatedMoviesUiState.Loading, initialState.topRatedMovies)
+      assertEquals(ActionMoviesUiState.Loading, initialState.actionMovies)
+      assertEquals(AnimationMoviesUiState.Loading, initialState.animationMovies)
+      assertFalse(initialState.isRefreshing)
+    }
+  }
+
+  @Ignore("Test that refreshing emits state with refreshing true followed by refreshing false")
+  @Test
+  fun `when refreshing then emits correct state`() = runTest {
+    viewModel.uiState.test {
+      viewModel.onRefresh()
+      assertTrue(awaitItem().isRefreshing)
+      assertFalse(awaitItem().isRefreshing)
     }
   }
 
