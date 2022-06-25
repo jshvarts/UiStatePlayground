@@ -1,5 +1,7 @@
-package com.example.uistateplayground.data
+package com.example.uistateplayground.data.source
 
+import com.example.uistateplayground.data.model.Movie
+import com.example.uistateplayground.data.model.WrapperMovieResults
 import retrofit2.http.GET
 import retrofit2.http.Query
 

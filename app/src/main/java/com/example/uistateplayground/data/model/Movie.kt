@@ -1,4 +1,4 @@
-package com.example.uistateplayground.data
+package com.example.uistateplayground.data.model
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -12,3 +12,9 @@ data class Movie(
 ) {
   val posterUrl: String by lazy { POSTER_IMAGE_BASE_URL + posterPath }
 }
+
+fun Movie.asEntity(genreId: String? = null) = MovieEntity(
+  title = title,
+  posterPath = posterPath,
+  genreId = genreId
+)

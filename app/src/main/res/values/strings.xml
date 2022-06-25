@@ -13,4 +13,7 @@
     <string name="section_error_animation">Failed to load Animation movies</string>
 
     <string name="section_filter_text_default">See All</string>
+
+    <string name="error_occurred">Check your connection or try again later.</string>
+
 </resources>

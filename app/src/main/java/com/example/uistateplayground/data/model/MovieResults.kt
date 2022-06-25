@@ -1,4 +1,4 @@
-package com.example.uistateplayground.data
+package com.example.uistateplayground.data.model
 
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonQualifier
@@ -12,7 +12,7 @@ data class MovieResults(
 @JsonQualifier
 annotation class WrapperMovieResults
 
-class ReposJsonConverter {
+class MoviesJsonConverter {
   @WrapperMovieResults
   @FromJson
   fun fromJson(json: MovieResults): List<Movie> {

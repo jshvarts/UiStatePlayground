@@ -1,5 +1,8 @@
 package com.example.uistateplayground.data
 
+import com.example.uistateplayground.data.model.Movie
+import com.example.uistateplayground.data.model.MovieGenre
+import com.example.uistateplayground.data.repo.MovieRepository
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,6 +31,14 @@ class TestMovieRepository : MovieRepository {
   override fun getMoviesStream(genre: MovieGenre): Flow<List<Movie>> = when (genre) {
     MovieGenre.ACTION -> actionMoviesFlow
     MovieGenre.ANIMATION -> animationMoviesFlow
+  }
+
+  override suspend fun refreshTopRated() {
+    // no-op
+  }
+
+  override suspend fun refreshGenre(genre: MovieGenre) {
+    // no-op
   }
 
   /**
