@@ -1,9 +1,9 @@
 package com.example.uistateplayground.ui
 
 import app.cash.turbine.test
-import com.example.uistateplayground.data.Movie
-import com.example.uistateplayground.data.MovieGenre
 import com.example.uistateplayground.data.TestMovieRepository
+import com.example.uistateplayground.data.model.Movie
+import com.example.uistateplayground.data.model.MovieGenre
 import com.example.uistateplayground.util.TestDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

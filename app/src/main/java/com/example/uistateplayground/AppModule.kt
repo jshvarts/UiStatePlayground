@@ -1,7 +1,7 @@
 package com.example.uistateplayground
 
-import com.example.uistateplayground.data.Api
-import com.example.uistateplayground.data.ReposJsonConverter
+import com.example.uistateplayground.data.model.MoviesJsonConverter
+import com.example.uistateplayground.data.source.Api
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -47,7 +47,7 @@ class AppModule {
       .addInterceptor(loggingInterceptor)
 
     val moshi = Moshi.Builder()
-      .add(ReposJsonConverter())
+      .add(MoviesJsonConverter())
       .addLast(KotlinJsonAdapterFactory())
       .build()
 

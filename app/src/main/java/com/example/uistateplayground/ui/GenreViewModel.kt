@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.uistateplayground.core.Result
 import com.example.uistateplayground.core.asResult
-import com.example.uistateplayground.data.Movie
-import com.example.uistateplayground.data.MovieGenre
-import com.example.uistateplayground.data.MovieRepository
+import com.example.uistateplayground.data.model.Movie
+import com.example.uistateplayground.data.model.MovieGenre
+import com.example.uistateplayground.data.repo.MovieRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

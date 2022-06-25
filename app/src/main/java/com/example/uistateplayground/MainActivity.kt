@@ -1,6 +1,7 @@
 package com.example.uistateplayground
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
@@ -33,8 +34,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.example.uistateplayground.data.Movie
-import com.example.uistateplayground.data.MovieGenre
+import com.example.uistateplayground.data.model.Movie
+import com.example.uistateplayground.data.model.MovieGenre
 import com.example.uistateplayground.ui.*
 import com.example.uistateplayground.ui.navigation.Screen
 import com.example.uistateplayground.ui.navigation.UiStatePlaygroundNavHost
@@ -73,6 +74,15 @@ fun HomeScreen(
   homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
   val uiState: HomeUiState by homeViewModel.uiState.collectAsState()
+  val context = LocalContext.current
+  val errorMessage = stringResource(id = R.string.error_occurred)
+
+  if (uiState.isError) {
+    LaunchedEffect(Unit) {
+      homeViewModel.onErrorConsumed()
+      Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+    }
+  }
 
   SwipeRefresh(
     state = rememberSwipeRefreshState(uiState.isRefreshing),
@@ -489,5 +499,8 @@ private fun getAnimationMovieUiState(): AnimationMoviesUiState {
 }
 
 private fun getFakeMovieList() = List(10) { index ->
-  Movie(index.toString(), "")
+  Movie(
+    title = index.toString(),
+    posterPath = "",
+  )
 }
