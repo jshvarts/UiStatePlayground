@@ -1,7 +1,6 @@
 package com.example.uistateplayground
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
@@ -72,55 +71,63 @@ fun HomeScreen(
   navController: NavController,
   modifier: Modifier = Modifier,
   homeViewModel: HomeViewModel = hiltViewModel(),
+  scaffoldState: ScaffoldState = rememberScaffoldState()
 ) {
   val uiState: HomeUiState by homeViewModel.uiState.collectAsState()
-  val context = LocalContext.current
-  val errorMessage = stringResource(id = R.string.error_occurred)
+  val errorMessage = stringResource(id = R.string.error_text)
+  val okText = stringResource(id = R.string.ok_button_text)
 
   if (uiState.isError) {
-    LaunchedEffect(Unit) {
+    LaunchedEffect(scaffoldState.snackbarHostState) {
+      scaffoldState.snackbarHostState.showSnackbar(
+        message = errorMessage,
+        actionLabel = okText
+      )
       homeViewModel.onErrorConsumed()
-      Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
     }
   }
 
-  SwipeRefresh(
-    state = rememberSwipeRefreshState(uiState.isRefreshing),
-    onRefresh = { homeViewModel.onRefresh() }
-  ) {
-    Column(
-      modifier
-        .verticalScroll(
-          rememberScrollState()
-        )
+  Scaffold(scaffoldState = scaffoldState) { padding ->
+    SwipeRefresh(
+      state = rememberSwipeRefreshState(uiState.isRefreshing),
+      onRefresh = { homeViewModel.onRefresh() },
+      modifier = Modifier
+        .padding(padding)
     ) {
-      Spacer(Modifier.height(16.dp))
-
-      ScreenTitle(R.string.screen_title_home)
-
-      HomeSection(title = R.string.section_title_top_rated) {
-        TopRatedMovieList(uiState.topRatedMovies)
-      }
-
-      HomeSection(
-        title = R.string.section_title_action,
-        filter = SectionFilter {
-          navController.navigate(Screen.ActionMovies.route)
-        }
+      Column(
+        modifier
+          .verticalScroll(
+            rememberScrollState()
+          )
       ) {
-        ActionMovieList(uiState.actionMovies)
-      }
+        Spacer(Modifier.height(16.dp))
 
-      HomeSection(
-        title = R.string.section_title_animation,
-        filter = SectionFilter {
-          navController.navigate(Screen.AnimationMovies.route)
+        ScreenTitle(R.string.screen_title_home)
+
+        HomeSection(title = R.string.section_title_top_rated) {
+          TopRatedMovieList(uiState.topRatedMovies)
         }
-      ) {
-        AnimationMovieList(uiState.animationMovies)
-      }
 
-      Spacer(Modifier.height(16.dp))
+        HomeSection(
+          title = R.string.section_title_action,
+          filter = SectionFilter {
+            navController.navigate(Screen.ActionMovies.route)
+          }
+        ) {
+          ActionMovieList(uiState.actionMovies)
+        }
+
+        HomeSection(
+          title = R.string.section_title_animation,
+          filter = SectionFilter {
+            navController.navigate(Screen.AnimationMovies.route)
+          }
+        ) {
+          AnimationMovieList(uiState.animationMovies)
+        }
+
+        Spacer(Modifier.height(16.dp))
+      }
     }
   }
 }

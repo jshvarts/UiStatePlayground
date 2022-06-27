@@ -14,6 +14,7 @@
 
     <string name="section_filter_text_default">See All</string>
 
-    <string name="error_occurred">Check your connection or try again later.</string>
+    <string name="error_text">Check your connection or try again later.</string>
+    <string name="ok_button_text">OK</string>
 
 </resources>
