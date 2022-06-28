@@ -165,7 +165,7 @@ fun HomeSection(
 }
 
 @Composable
-fun TopRatedMovieList(uiState: TopRatedMoviesUiState) {
+fun TopRatedMovieList(uiState: UiState<List<Movie>>) {
 
   LazyRow(
     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -175,16 +175,16 @@ fun TopRatedMovieList(uiState: TopRatedMoviesUiState) {
     )
   ) {
     when (uiState) {
-      TopRatedMoviesUiState.Error -> {
+      UiState.Error -> {
         homeSectionErrorText(R.string.section_error_top_rated)
       }
-      TopRatedMoviesUiState.Loading -> {
+      UiState.Loading -> {
         item {
           LoadingIndicator()
         }
       }
-      is TopRatedMoviesUiState.Success -> {
-        items(uiState.movies) { movie ->
+      is UiState.Success -> {
+        items(uiState.data) { movie ->
           HomePosterImage(movie)
         }
       }
@@ -193,7 +193,7 @@ fun TopRatedMovieList(uiState: TopRatedMoviesUiState) {
 }
 
 @Composable
-fun ActionMovieList(uiState: ActionMoviesUiState) {
+fun ActionMovieList(uiState: UiState<List<Movie>>) {
   LazyRow(
     modifier = Modifier
       .height(160.dp),
@@ -204,16 +204,16 @@ fun ActionMovieList(uiState: ActionMoviesUiState) {
     )
   ) {
     when (uiState) {
-      ActionMoviesUiState.Error -> {
+      UiState.Error -> {
         homeSectionErrorText(R.string.section_error_action)
       }
-      ActionMoviesUiState.Loading -> {
+      UiState.Loading -> {
         item {
           LoadingIndicator()
         }
       }
-      is ActionMoviesUiState.Success -> {
-        items(uiState.movies) { movie ->
+      is UiState.Success -> {
+        items(uiState.data) { movie ->
           HomePosterImage(movie)
         }
       }
@@ -222,7 +222,7 @@ fun ActionMovieList(uiState: ActionMoviesUiState) {
 }
 
 @Composable
-fun AnimationMovieList(uiState: AnimationMoviesUiState) {
+fun AnimationMovieList(uiState: UiState<List<Movie>>) {
   LazyHorizontalGrid(
     rows = GridCells.Fixed(2),
     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -236,16 +236,16 @@ fun AnimationMovieList(uiState: AnimationMoviesUiState) {
       .fillMaxWidth()
   ) {
     when (uiState) {
-      AnimationMoviesUiState.Error -> {
+      UiState.Error -> {
         homeSectionErrorText(R.string.section_error_animation)
       }
-      AnimationMoviesUiState.Loading -> {
+      UiState.Loading -> {
         item {
           LoadingIndicator()
         }
       }
-      is AnimationMoviesUiState.Success -> {
-        items(uiState.movies) { movie ->
+      is UiState.Success -> {
+        items(uiState.data) { movie ->
           HomePosterImage(movie)
         }
       }
@@ -490,19 +490,19 @@ data class SectionFilter(
   val onClick: () -> Unit
 )
 
-private fun getTopRatedMovieUiState(): TopRatedMoviesUiState {
+private fun getTopRatedMovieUiState(): UiState<List<Movie>> {
   val movies = getFakeMovieList()
-  return TopRatedMoviesUiState.Success(movies)
+  return UiState.Success(movies)
 }
 
-private fun getActionMovieUiState(): ActionMoviesUiState {
+private fun getActionMovieUiState(): UiState<List<Movie>> {
   val movies = getFakeMovieList()
-  return ActionMoviesUiState.Success(movies)
+  return UiState.Success(movies)
 }
 
-private fun getAnimationMovieUiState(): AnimationMoviesUiState {
+private fun getAnimationMovieUiState(): UiState<List<Movie>> {
   val movies = getFakeMovieList()
-  return AnimationMoviesUiState.Success(movies)
+  return UiState.Success(movies)
 }
 
 private fun getFakeMovieList() = List(10) { index ->
