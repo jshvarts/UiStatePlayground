@@ -135,8 +135,8 @@ fun HomeScreen(
 @Composable
 fun HomeSection(
   @StringRes title: Int,
-  filter: SectionFilter? = null,
   modifier: Modifier = Modifier,
+  filter: SectionFilter? = null,
   content: @Composable () -> Unit
 ) {
   Column {
