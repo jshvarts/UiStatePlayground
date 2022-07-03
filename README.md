@@ -1,5 +1,7 @@
 # UI State Playground
 
+[![Android Weekly badge](https://androidweekly.net/issues/issue-524/badge)](https://androidweekly.net/issues/issue-524)
+
 Companion repo to my blog post [Compose sample app: UI state with Flow, offline first](https://www.valueof.io/blog/compose-ui-state-flow-offline-first-repository)
 
 ## Summary of what that post covers:
