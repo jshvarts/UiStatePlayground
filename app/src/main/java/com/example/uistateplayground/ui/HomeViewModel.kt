@@ -17,33 +17,20 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Immutable
 data class HomeUiState(
-  val topRatedMovies: TopRatedMoviesUiState,
-  val actionMovies: ActionMoviesUiState,
-  val animationMovies: AnimationMoviesUiState,
+  val topRatedMovies: UiState<List<Movie>>,
+  val actionMovies: UiState<List<Movie>>,
+  val animationMovies: UiState<List<Movie>>,
   val isRefreshing: Boolean,
   val isError: Boolean
 )
 
 @Immutable
-sealed interface TopRatedMoviesUiState {
-  data class Success(val movies: List<Movie>) : TopRatedMoviesUiState
-  object Error : TopRatedMoviesUiState
-  object Loading : TopRatedMoviesUiState
-}
-
-@Immutable
-sealed interface ActionMoviesUiState {
-  data class Success(val movies: List<Movie>) : ActionMoviesUiState
-  object Error : ActionMoviesUiState
-  object Loading : ActionMoviesUiState
-}
-
-@Immutable
-sealed interface AnimationMoviesUiState {
-  data class Success(val movies: List<Movie>) : AnimationMoviesUiState
-  object Error : AnimationMoviesUiState
-  object Loading : AnimationMoviesUiState
+sealed interface UiState<out T> {
+  data class Success<T>(val data: T) : UiState<T>
+  object Error : UiState<Nothing>
+  object Loading : UiState<Nothing>
 }
 
 @HiltViewModel
@@ -78,22 +65,22 @@ class HomeViewModel @Inject constructor(
     isError
   ) { topRatedResult, actionMoviesResult, animationMoviesResult, refreshing, errorOccurred ->
 
-    val topRated: TopRatedMoviesUiState = when (topRatedResult) {
-      is Result.Success -> TopRatedMoviesUiState.Success(topRatedResult.data)
-      is Result.Loading -> TopRatedMoviesUiState.Loading
-      is Result.Error -> TopRatedMoviesUiState.Error
+    val topRated: UiState<List<Movie>> = when (topRatedResult) {
+      is Result.Success -> UiState.Success(topRatedResult.data)
+      is Result.Loading -> UiState.Loading
+      is Result.Error -> UiState.Error
     }
 
-    val action: ActionMoviesUiState = when (actionMoviesResult) {
-      is Result.Success -> ActionMoviesUiState.Success(actionMoviesResult.data)
-      is Result.Loading -> ActionMoviesUiState.Loading
-      is Result.Error -> ActionMoviesUiState.Error
+    val action: UiState<List<Movie>> = when (actionMoviesResult) {
+      is Result.Success -> UiState.Success(actionMoviesResult.data)
+      is Result.Loading -> UiState.Loading
+      is Result.Error -> UiState.Error
     }
 
-    val animation: AnimationMoviesUiState = when (animationMoviesResult) {
-      is Result.Success -> AnimationMoviesUiState.Success(animationMoviesResult.data)
-      is Result.Loading -> AnimationMoviesUiState.Loading
-      is Result.Error -> AnimationMoviesUiState.Error
+    val animation: UiState<List<Movie>> = when (animationMoviesResult) {
+      is Result.Success -> UiState.Success(animationMoviesResult.data)
+      is Result.Loading -> UiState.Loading
+      is Result.Error -> UiState.Error
     }
 
     HomeUiState(
@@ -108,9 +95,9 @@ class HomeViewModel @Inject constructor(
       scope = viewModelScope,
       started = WhileUiSubscribed,
       initialValue = HomeUiState(
-        TopRatedMoviesUiState.Loading,
-        ActionMoviesUiState.Loading,
-        AnimationMoviesUiState.Loading,
+        UiState.Loading,
+        UiState.Loading,
+        UiState.Loading,
         isRefreshing = false,
         isError = false
       )
