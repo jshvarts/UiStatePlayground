@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import com.example.uistateplayground.data.TestMovieRepository
 import com.example.uistateplayground.data.model.Movie
 import com.example.uistateplayground.data.model.MovieGenre
-import com.example.uistateplayground.util.TestDispatcherRule
+import com.example.uistateplayground.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -14,7 +14,7 @@ import org.junit.Test
 
 class GenreViewModelTest {
   @get:Rule
-  val dispatcherRule = TestDispatcherRule()
+  val mainDispatcherRule = MainDispatcherRule()
 
   private val moviesRepository = TestMovieRepository()
 

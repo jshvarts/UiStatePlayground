@@ -116,7 +116,7 @@ class HomeViewModel @Inject constructor(
       )
     )
 
-  fun onRefresh() {
+  fun  onRefresh() {
     viewModelScope.launch(exceptionHandler) {
       with(movieRepository) {
         val refreshTopRatedDeferred = async { refreshTopRated() }

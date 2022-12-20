@@ -3,19 +3,20 @@ package com.example.uistateplayground.ui
 import app.cash.turbine.test
 import com.example.uistateplayground.data.TestMovieRepository
 import com.example.uistateplayground.data.model.Movie
-import com.example.uistateplayground.util.TestDispatcherRule
+import com.example.uistateplayground.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
   @get:Rule
-  val dispatcherRule = TestDispatcherRule()
+  val mainDispatcherRule = MainDispatcherRule()
 
   private val moviesRepository = TestMovieRepository()
 
@@ -55,15 +56,6 @@ class HomeViewModelTest {
       assertEquals(ActionMoviesUiState.Loading, initialState.actionMovies)
       assertEquals(AnimationMoviesUiState.Loading, initialState.animationMovies)
       assertFalse(initialState.isRefreshing)
-    }
-  }
-
-  //@Ignore("Test that refreshing emits state with refreshing true followed by refreshing false")
-  @Test
-  fun `when refreshing then emits correct state`() = runTest {
-    viewModel.uiState.test {
-      viewModel.onRefresh()
-      assertFalse(awaitItem().isRefreshing)
     }
   }
 
@@ -112,19 +104,24 @@ class HomeViewModelTest {
   @Test
   fun `when movie ui states emit success then home uiState emits success for each`() =
     runTest {
-      viewModel.uiState.test {
-        moviesRepository.sendTopRatedMovies(testInputTopRatedMovies)
-        moviesRepository.sendActionMovies(testInputActionMovies)
-        moviesRepository.sendAnimationMovies(testInputAnimationMovies)
+      val collectJob = launch {
+        viewModel.uiState.collect()
 
-        // skip loading state
-        awaitItem()
+        viewModel.uiState.test {
+          moviesRepository.sendTopRatedMovies(testInputTopRatedMovies)
+          moviesRepository.sendActionMovies(testInputActionMovies)
+          moviesRepository.sendAnimationMovies(testInputAnimationMovies)
 
-        val uiState = awaitItem()
-        assertTrue(uiState.topRatedMovies is TopRatedMoviesUiState.Success)
-        assertTrue(uiState.actionMovies is ActionMoviesUiState.Success)
-        assertTrue(uiState.animationMovies is AnimationMoviesUiState.Success)
+          // skip loading state
+          awaitItem()
+
+          val uiState = awaitItem()
+          assertTrue(uiState.topRatedMovies is TopRatedMoviesUiState.Success)
+          assertTrue(uiState.actionMovies is ActionMoviesUiState.Success)
+          assertTrue(uiState.animationMovies is AnimationMoviesUiState.Success)
+        }
       }
+      collectJob.cancel()
     }
 }
 
